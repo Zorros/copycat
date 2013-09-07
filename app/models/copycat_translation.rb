@@ -4,8 +4,7 @@ class CopycatTranslation < ActiveRecord::Base
     self.logger = Logger.new('/dev/null')
   end
 
-  validates :key, :presence => true
-  validates :locale, :presence => true
+  validates_presence_of :key, :locale
 
   attr_accessible :locale, :key, :value
 
