@@ -9,9 +9,11 @@ module Copycat
   mattr_accessor :route
   mattr_accessor :everything_is_html_safe
   mattr_accessor :staging_server_endpoint
+  mattr_accessor :silence_warnings
 
   @@route = 'copycat_translations'
   @@everything_is_html_safe = false
+  @@silence_warnings = true
 
   def self.setup
     yield self

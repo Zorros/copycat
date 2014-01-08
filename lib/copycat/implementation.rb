@@ -11,7 +11,13 @@ module Copycat
 
       value = super(locale, key, scope, options)
       if value.is_a?(String) || value.nil?
-        CopycatTranslation.create(locale: locale.to_s, key: scoped_key, value: value)
+        begin
+          CopycatTranslation.create(locale: locale.to_s, key: scoped_key, value: value)
+        rescue
+          unless Copycat.silence_warnings == true
+            warn("The key #{scoped_key} could not be created in the database.")
+          end
+        end
       end
       value
     end
