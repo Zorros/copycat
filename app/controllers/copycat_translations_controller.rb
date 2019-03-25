@@ -5,7 +5,7 @@ class CopycatTranslationsController < ActionController::Base
   layout 'copycat'
 
   def index
-    params[:locale] = I18n.default_locale unless params.has_key?(:locale)
+    params[:locale] ||= I18n.default_locale
     query = CopycatTranslation
     query = query.where(locale: params[:locale]) unless params[:locale].blank?
 
@@ -20,7 +20,7 @@ class CopycatTranslationsController < ActionController::Base
     else
       @copycat_translations = []
     end
-    @locale_names = CopycatTranslation.find(:all, select: 'distinct locale').map(&:locale)
+    @locale_names = CopycatTranslation.uniq.pluck(:locale)
   end
 
   def edit
@@ -31,7 +31,7 @@ class CopycatTranslationsController < ActionController::Base
     @copycat_translation = CopycatTranslation.find(params[:id])
     @copycat_translation.value = params[:copycat_translation][:value]
     @copycat_translation.save!
-    redirect_to copycat_translations_path, :notice => "#{@copycat_translation.key} updated!"
+    redirect_to copycat_translations_path, notice: "#{@copycat_translation.key} updated!"
   end
 
   def import_export
@@ -39,26 +39,22 @@ class CopycatTranslationsController < ActionController::Base
 
   def download
     filename = "copycat_translations_#{Time.now.strftime("%Y_%m_%d_%H_%M_%S")}.yml"
-    send_data CopycatTranslation.export_yaml, :filename => filename
+    send_data CopycatTranslation.export_yaml, filename: filename
   end
 
   def upload
-    begin
       CopycatTranslation.import_yaml(params["file"].tempfile)
+      redirect_to copycat_translations_path, notice: "YAML file uploaded successfully!"
     rescue Exception => e
       logger.info "\n#{e.class}\n#{e.message}"
       flash[:notice] = "There was an error processing your upload!"
-      render :action => 'import_export', :status => 400
-    else
-      redirect_to copycat_translations_path, :notice => "YAML file uploaded successfully!"
-    end
+      render action: :import_export, status: 400
   end
 
   def destroy
     @copycat_translation = CopycatTranslation.find(params[:id])
-    notice = "#{@copycat_translation.key} deleted!"
     @copycat_translation.destroy
-    redirect_to copycat_translations_path, :notice => notice
+    redirect_to copycat_translations_path, notice: "#{@copycat_translation.key} deleted!"
   end
 
   def help
@@ -66,7 +62,7 @@ class CopycatTranslationsController < ActionController::Base
 
   def sync
     if Copycat.staging_server_endpoint.nil?
-      redirect_to :back, alert: 'You didn\'t set your source server'
+      redirect_to :back, alert: "You didn't set your source server"
     else
       yaml = read_remote_yaml(Copycat.staging_server_endpoint)
 

@@ -4,8 +4,7 @@ class CopycatTranslation < ActiveRecord::Base
     self.logger = Logger.new('/dev/null')
   end
 
-  validates :key, :presence => true
-  validates :locale, :presence => true
+  validates_presence_of :key, :locale
 
   attr_accessible :locale, :key, :value
 
@@ -25,8 +24,7 @@ class CopycatTranslation < ActiveRecord::Base
 
     def export_yaml
       hash = {}
-      all.each do |c|
-        next unless c.value
+      where("value is not null").each do |c|
         hash_fatten!(hash, [c.locale].concat(c.key.split(".")), c.value)
       end
       hash.to_yaml
