@@ -7,8 +7,6 @@ class CopycatTranslation < ActiveRecord::Base
   validates :key, :presence => true
   validates :locale, :presence => true
 
-  attr_accessible :locale, :key, :value
-
   module Serialize
 
     def import_yaml(yaml)
