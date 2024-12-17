@@ -18,4 +18,3 @@ module Copycat
     yield self
   end
 end
-

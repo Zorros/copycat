@@ -20,7 +20,7 @@ module Copycat
 
       if cct
         log_copycat_keys(locale, key, scope, options, scoped_key, cct)
-        return cct.value
+        return Copycat.everything_is_html_safe ? cct.value.html_safe : cct.value
       end
 
       value = super(locale, key, scope, options)
