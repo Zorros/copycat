@@ -6,6 +6,7 @@
       %a{:href => "http://guides.rubyonrails.org/i18n.html"} I18n conventions
   = form_tag 'upload', :multipart => true, :'accept-charset' => 'UTF-8' do
     = file_field_tag "file"
+    = hidden_field_tag :authenticity_token, form_authenticity_token
     = submit_tag "Upload"
 
 - unless Copycat.staging_server_endpoint.nil? || Rails.env.staging?
