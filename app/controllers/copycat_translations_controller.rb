@@ -66,15 +66,15 @@ class CopycatTranslationsController < ActionController::Base
 
   def sync
     if Copycat.staging_server_endpoint.nil?
-      redirect_to :back, alert: 'You didn\'t set your source server'
+      redirect_back fallback_location: copycat_translations_path, alert: 'You didn\'t set your source server'
     else
       yaml = read_remote_yaml(Copycat.staging_server_endpoint)
 
       if yaml
         CopycatTranslation.import_yaml(yaml)
-        redirect_to :back, notice: "Translations synced from source server"
+        redirect_back fallback_location: copycat_translations_path, notice: 'Translations synced from source server'
       else
-        redirect_to :back
+        redirect_back fallback_location: copycat_translations_path
       end
 
     end
